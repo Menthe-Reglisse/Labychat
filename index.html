@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta name="viewport", initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
   margin: 0;
@@ -280,10 +280,13 @@ canvas {
       clearTimeout(orientationChangeTimer);
       orientationChangeTimer = setTimeout(function () {//control of the delay between each screen orientation listening event to ensure that the orientation changes are well detected
 
-      var WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
-      var HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2;
-      //var FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
-      var FPS_TEXTFONTSIZE = 2.0, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in vw (number of % of viewport)
+      canvas = document.getElementById('screen');
+      context = canvas.getContext('2d');
+
+      WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
+      HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2; 
+      //FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+      FPS_TEXTFONTSIZE = 2.0, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in vw (number of % of viewport)
       STEP_ANGLE = FOV / WIDTH;
       },200); //delay of function call in ms
 
