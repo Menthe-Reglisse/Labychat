@@ -116,8 +116,8 @@ canvas {
   */
 
   // init canvas
-  const canvas = document.getElementById('screen');
-  const context = canvas.getContext('2d');
+  var canvas = document.getElementById('screen');
+  var context = canvas.getContext('2d');
 
   // collapsible and music
 
@@ -128,17 +128,17 @@ canvas {
 
   
   // screen
-  //const WIDTH = 300, HALF_WIDTH = WIDTH / 2;
-  //const HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
-  //const WIDTH = 600, HALF_WIDTH = WIDTH / 2;
-  //const HEIGHT = 400, HALF_HEIGHT = HEIGHT / 2;
-  //const WIDTH = 800, HALF_WIDTH = WIDTH / 2;
-  //const HEIGHT = 600, HALF_HEIGHT = HEIGHT / 2;
-  const WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
-  const HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2;
+  //var WIDTH = 300, HALF_WIDTH = WIDTH / 2;
+  //var HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
+  //var WIDTH = 600, HALF_WIDTH = WIDTH / 2;
+  //var HEIGHT = 400, HALF_HEIGHT = HEIGHT / 2;
+  //var WIDTH = 800, HALF_WIDTH = WIDTH / 2;
+  //var HEIGHT = 600, HALF_HEIGHT = HEIGHT / 2;
+  var WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
+  var HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2;
 
-  //const FPS_TEXTFONTSIZE = 60, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
-  const FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+  //var FPS_TEXTFONTSIZE = 60, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+  var FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
 
   // FPS
   const FPS = 200;
@@ -254,7 +254,7 @@ canvas {
   const DOUBLE_PI = 2 * Math.PI;
   const FOV = Math.PI / 3;
   const HALF_FOV = FOV / 2;
-  const STEP_ANGLE = FOV / WIDTH;
+  var STEP_ANGLE = FOV / WIDTH;
   
   // graphics
   const WALLS = [];
@@ -507,6 +507,14 @@ canvas {
       }
     return showMapVal;
   }
+
+  function smartphoneScreenOrientation(phoneOrientationVal) {
+  if (window.matchMedia("(orientation: portrait)").matches) {
+    phoneOrientationVal = 0;
+  } else {
+    phoneOrientationVal = 1;
+  }
+}
 
   
 </script>
