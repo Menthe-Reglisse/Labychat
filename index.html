@@ -461,7 +461,7 @@ canvas {
     context.fillStyle = '#624530';
     //context.font = '60px Monospace';
     context.font = FPS_TEXTFONTSIZE + 'vw Monospace';
-    context.fillText('FPS: ' + fps_rate, mapOffsetX * 0.2, mapOffsetY + HALF_HEIGHT + HALF_FPS_TEXTFONTSIZE);
+    context.fillText('FPS: ' + fps_rate, mapOffsetX * 0.25, mapOffsetY + HALF_HEIGHT + HALF_FPS_TEXTFONTSIZE, Math.floor(0.5 * Math.max(HEIGHT,WIDTH)) / 2);
     
   } window.onload = function() { gameLoop(); }
 
