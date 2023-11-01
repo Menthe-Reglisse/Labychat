@@ -1,0 +1,520 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+body {
+  margin: 0;
+  font-family: Arial;
+  font-size: 16px;
+}
+
+* {
+    box-sizing: border-box
+}
+
+.collapsible {
+  background-color: #2d55f980;
+  color: #ffffffff;
+  cursor: pointer;
+  padding: 20px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-family: Arial;
+  font-size: 20px; 
+}
+
+#myCollapsibleBtn:hover {
+  background-color: #ffffff80;
+  color: #2d55f9ff;
+}
+
+
+
+.content {
+  position: fixed;
+  bottom: 0;
+  /* background: #7070ff80; */
+  background: #2d55f980;
+  color: #ffffffff;
+  width: 100%;
+  padding: 10px;
+} 
+
+#myBackgroundMusicBtn {
+  width: 200px;
+  font-size: 18px;
+  padding: 10px;
+  border: none;
+  background: #68c48aff;
+  color: #ffffffff;
+  cursor: pointer;
+}
+
+#myBackgroundMusicBtn:hover {
+  background: #ffffffff;
+  color: #f1946aff;
+}
+
+.commandBtn {
+  width: 200px;
+  font-size: 18px;
+  padding: 10px;
+  border: none;
+  background: #68c48aff;
+  color: #ffffffff;
+  cursor: pointer;
+}
+
+.commandBtn:hover {
+  background: #ffffffff;
+  color: #f1946aff;
+}
+
+canvas { margin: 0px; padding: 0px; }
+
+</style>
+</head>
+<body>
+
+  <audio controls loop hidden id="myBackgroundMusic">
+    <source src="labychatEasterEggs_assets/sounds/Dofus_Incarnam.mp3" type="audio/mp3">
+  </audio>
+  
+
+
+  
+ 
+  <div class="content">
+    <button class="collapsible" id="myCollapsibleBtn" onclick="toggleCollapsibleFunction()">Salle des Easter Eggs</button>
+    <div id="myCollapsibleContent">
+      <!-- <h1>Salle des Easter Eggs</h1> -->
+      <p>Bienvenue dans la salle secrète d'une thèse révolue.
+      Que vous ayiez résolu l'énigme cachée dans le manuscrit associé, ou que vous vous soyiez perdus sur les Internets, qu'importe !<br>
+      Profitez d'un instant de calme pour parcourir les couloirs de ce lieu, au clavier ou avec les boutons. Bonne visite !</p>
+      <button id="myBackgroundMusicBtn" onclick="backgroundMusicFunction()">Lecture musique</button>
+      <button id="myCommandUpBtn" class="commandBtn">Avant (&uarr;)</button>
+      <button id="myCommandDownBtn" class="commandBtn">Arrière (&darr;)</button>
+      <button id="myCommandLeftBtn" class="commandBtn">Gauche (&larr;)</button>
+      <button id="myCommandRightBtn" class="commandBtn">Droite (&rarr;)</button>
+      <button id="myCommandMapBtn" class="commandBtn" onclick="commandMapFunction()">Montrer carte (Shift)</button>
+    </div>
+
+  </div>
+  
+    <!--<canvas id="screen" style="width:100%; height: 100%"/>-->
+    <canvas id="screen"/>
+
+<script>
+
+  /*
+   Inspired from Monkey King code from
+   JS didactic implementation of Wolfenstein
+  */
+
+  // init canvas
+  const canvas = document.getElementById('screen');
+  const context = canvas.getContext('2d');
+
+  // collapsible and music
+
+  var coll = document.getElementsByClassName("collapsible");
+
+  var backgroundMusic = document.getElementById("myBackgroundMusic");
+  var backgroundMusicBtn = document.getElementById("myBackgroundMusicBtn");
+
+  
+  // screen
+  //const WIDTH = 300, HALF_WIDTH = WIDTH / 2;
+  //const HEIGHT = 200, HALF_HEIGHT = HEIGHT / 2;
+  //const WIDTH = 600, HALF_WIDTH = WIDTH / 2;
+  //const HEIGHT = 400, HALF_HEIGHT = HEIGHT / 2;
+  //const WIDTH = 800, HALF_WIDTH = WIDTH / 2;
+  //const HEIGHT = 600, HALF_HEIGHT = HEIGHT / 2;
+  const WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
+  const HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2;
+
+  //const FPS_TEXTFONTSIZE = 60, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+  const FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+
+  // FPS
+  const FPS = 200;
+  const cycleDelay = Math.floor(1000 / FPS); //delay of one frame
+  var oldCycleTime = 0;
+  var cycleCount = 0;
+  var fps_rate = '...';
+  
+  // map
+  const MAP_SIZE = 32;
+  const MAP_SCALE = 512;
+  const MAP_RANGE = MAP_SCALE * MAP_SIZE;
+  const MAP_SPEED = (MAP_SCALE / 2) / 10*1.5;
+
+  const EDGE2D = Math.ceil(Math.min(HEIGHT,WIDTH) / MAP_SIZE * 0.5); //size in px of 2D map squares
+
+  var map = [
+    1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+    1, 0, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 0, 0, 0, 4, 3, 4, 3, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 9, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 7, 7, 7, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  ];
+  var showMap = false;
+  var shownMap = false;
+  
+  // player
+  var playerX = MAP_SCALE + 4 * EDGE2D;
+  var playerY = MAP_SCALE + 4 * EDGE2D;
+  var playerAngle = Math.PI / 3;
+  var playerMoveX = 0;
+  var playerMoveY = 0;
+  var playerMoveAngle = 0;
+  
+  // handle user input
+  document.onkeydown = function(event) {
+    switch (event.keyCode) {
+      case 38: playerMoveX = 1; playerMoveY = 1; break;                                                         /* arrow up                        */
+      case 40: playerMoveX = -1; playerMoveY = -1; break;                                                       /* arrow down                      */
+      case 37: playerMoveAngle = 1; break;                                                                      /* arrow left                      */
+      case 39: playerMoveAngle = -1; break;                                                                     /* arrow right                     */
+      case 16: showMap = true; commandMapFunction(!showMap); shownMap=showMap; break;                           /* left or right shift (show map)  */
+    }
+  }
+  
+  document.onkeyup = function(event) {
+    switch (event.keyCode) {
+      case 38:
+      case 40: playerMoveX = 0; playerMoveY = 0; break;
+      case 37:
+      case 39: playerMoveAngle = 0; break;
+      case 16: showMap = false; commandMapFunction(!showMap); shownMap=showMap; break;
+    }
+  } 
+
+  //user input with buttons instead of keyboard keys on click maintain except for left and right shift where the key is not simulated showMap boolean is directly changed
+  var upFromButton = document.getElementById('myCommandUpBtn');
+  var keyEventUp = null;
+
+  upFromButton.addEventListener('mousedown', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)});
+  upFromButton.addEventListener('mouseup', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)});  
+
+  var downFromButton = document.getElementById('myCommandDownBtn');
+  var keyEventDown = null;
+
+  downFromButton.addEventListener('mousedown', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)});
+  downFromButton.addEventListener('mouseup', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)});  
+
+  var leftFromButton = document.getElementById('myCommandLeftBtn');
+  var keyEventLeft = null;
+
+  leftFromButton.addEventListener('mousedown', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)});
+  leftFromButton.addEventListener('mouseup', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)});  
+  
+  var rightFromButton = document.getElementById('myCommandRightBtn');
+  var keyEventRight = null;
+
+  rightFromButton.addEventListener('mousedown', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});
+  rightFromButton.addEventListener('mouseup', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});    
+
+  var mapFromButton = document.getElementById('myCommandMapBtn');
+  
+  mapFromButton.addEventListener('click', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;});
+  
+  // camera
+  const DOUBLE_PI = 2 * Math.PI;
+  const FOV = Math.PI / 3;
+  const HALF_FOV = FOV / 2;
+  const STEP_ANGLE = FOV / WIDTH;
+  
+  // graphics
+  const WALLS = [];
+  const MAX_WALL_HEIGHT = 50000;
+  const MAX_HEXA = 255;
+  const K_DARKEN = 1.5; // alpha of the darken points located to more than 1/K of the map range is 0%: color is dark color without transparency
+  //const K_DARKEN = 0.1;
+  
+  // load wall textures
+  for (var filename = 0; filename < 10; filename++) {
+    var image = document.createElement('img');
+    image.src = 'labychatEasterEggs_assets/wallsTextures/' + filename + '.png';
+    WALLS.push(image);
+  }
+
+  // game loop
+  function gameLoop() {
+    // calculate FPS
+    cycleCount++;
+    if (cycleCount >= FPS) cycleCount = 0;
+    var startTime = Date.now();
+    var cycleTime = startTime - oldCycleTime;
+    oldCycleTime = startTime;
+    if (cycleCount % FPS == 0) fps_rate = Math.floor(1000 / cycleTime);
+    
+    // resize canvas
+    // canvas.width = window.innerWidth * 0.3;
+    // canvas.height = window.innerHeight * 0.3;
+    canvas.width = window.innerWidth * 1.0;
+    canvas.height = window.innerHeight * 1.0;
+
+    // update player position
+    var playerOffsetX = Math.sin(playerAngle) * MAP_SPEED;
+    var playerOffsetY = Math.cos(playerAngle) * MAP_SPEED;
+    var mapTargetX = Math.floor(playerY / MAP_SCALE) * MAP_SIZE + Math.floor((playerX + playerOffsetX * playerMoveX * 10) / MAP_SCALE);
+    var mapTargetY = Math.floor((playerY + playerOffsetY * playerMoveY * 10) / MAP_SCALE) * MAP_SIZE + Math.floor(playerX / MAP_SCALE);
+    
+    if (playerMoveX && map[mapTargetX] == 0) playerX += playerOffsetX * playerMoveX;
+    if (playerMoveY && map[mapTargetY] == 0) playerY += playerOffsetY * playerMoveY;
+    if (playerMoveAngle) playerAngle += 0.03 * playerMoveAngle;
+    
+    // calculate map & player offsets
+    var mapOffsetX = Math.floor(canvas.width / 2) - HALF_WIDTH;
+    var mapOffsetY = Math.floor(canvas.height / 2) - HALF_HEIGHT;
+    var playerMapX = (playerX / MAP_SCALE) * EDGE2D + mapOffsetX;
+    var playerMapY = (playerY / MAP_SCALE) * EDGE2D + mapOffsetY;
+
+    // draw floor and ceiling
+    //context.drawImage(WALLS[0], canvas.width / 2 - HALF_WIDTH, canvas.height / 2 - HALF_HEIGHT); //with texture
+
+    //context.fillStyle = '#7070ff'; //with two rectangles
+    //context.fillRect(mapOffsetX, mapOffsetY , WIDTH, HALF_HEIGHT);
+    //context.fillStyle = '#ccccff';
+    //context.fillRect(mapOffsetX, mapOffsetY + HALF_HEIGHT , WIDTH, HALF_HEIGHT);
+
+    var gradUp = context.createLinearGradient(0, 0, 0, HALF_HEIGHT); //with two rectangles with gradient
+    gradUp.addColorStop(0, '#7070ff');
+    gradUp.addColorStop(1, '#5a5acc');
+    context.fillStyle = gradUp; 
+    context.fillRect(mapOffsetX, mapOffsetY , WIDTH, HALF_HEIGHT);
+    var gradDown = context.createLinearGradient(0, mapOffsetY + HALF_HEIGHT, 0, HEIGHT); 
+    gradDown.addColorStop(0, '#a3a3cc');
+    gradDown.addColorStop(1, '#ccccff');
+    context.fillStyle = gradDown; 
+    context.fillRect(mapOffsetX, mapOffsetY + HALF_HEIGHT , WIDTH, HALF_HEIGHT);
+
+    // raycasting
+    var currentAngle = playerAngle + HALF_FOV;
+    var rayStartX = Math.floor(playerX / MAP_SCALE) * MAP_SCALE;
+    var rayStartY = Math.floor(playerY / MAP_SCALE) * MAP_SCALE;
+    
+    // loop over casted rays
+    for (var ray = 0; ray < WIDTH; ray++) {
+      // get current angle sin & cos
+      var currentSin = Math.sin(currentAngle); currentSin = currentSin ? currentSin : 0.000001;
+      var currentCos = Math.cos(currentAngle); currentCos = currentCos ? currentCos : 0.000001;
+    
+      // vertical line intersection
+      var rayEndX, rayEndY, rayDirectionX, verticalDepth, textureEndY, textureY;
+      if (currentSin > 0) { rayEndX = rayStartX + MAP_SCALE; rayDirectionX = 1 }
+      else { rayEndX = rayStartX; rayDirectionX = -1 }
+      for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+        verticalDepth = (rayEndX - playerX) / currentSin;
+        rayEndY = playerY + verticalDepth * currentCos;
+        var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+        var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+        if (currentSin <= 0) mapTargetX += rayDirectionX;
+        var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+        if (targetSquare < 0 || targetSquare > map.length - 1) break;
+        if (map[targetSquare] != 0) { textureY = map[targetSquare]; break; }
+        rayEndX += rayDirectionX * MAP_SCALE;
+      } textureEndY = rayEndY;
+      
+      // horizontal line intersection
+      var rayEndY, rayEndX, rayDirectionY, horizontalDepth, textureEndX, textureX;
+      if (currentCos > 0) { rayEndY = rayStartY + MAP_SCALE; rayDirectionY = 1 }
+      else { rayEndY = rayStartY; rayDirectionY = -1 }
+      for (var offset = 0; offset < MAP_RANGE; offset += MAP_SCALE) {
+        horizontalDepth = (rayEndY - playerY) / currentCos;
+        rayEndX = playerX + horizontalDepth * currentSin;
+        var mapTargetX = Math.floor(rayEndX / MAP_SCALE);
+        var mapTargetY = Math.floor(rayEndY / MAP_SCALE);
+        if (currentCos <= 0) mapTargetY += rayDirectionY;
+        var targetSquare = mapTargetY * MAP_SIZE + mapTargetX;
+        if (targetSquare < 0 || targetSquare > map.length - 1) break;
+        if (map[targetSquare] != 0) { textureX = map[targetSquare]; break; }
+        rayEndY += rayDirectionY * MAP_SCALE;
+      } textureEndX = rayEndX;
+      
+      // calculate 3D projection
+      var depth = verticalDepth < horizontalDepth ? verticalDepth : horizontalDepth;
+      var textureImage = verticalDepth < horizontalDepth ? textureY : textureX;
+      var textureOffset = verticalDepth < horizontalDepth ? textureEndY : textureEndX;
+      //if (playerY>rayEndY) textureOffset=1-textureOffset; //so that the texture is not inverted from left to right if the player is oriented toward a direction with X<0 or Y<0
+      textureOffset = Math.floor(textureOffset - Math.floor(textureOffset / MAP_SCALE) * MAP_SCALE);
+      depth *= Math.cos(playerAngle - currentAngle);
+      var wallHeight = Math.min(Math.floor(MAP_SCALE * (0.9 * WIDTH) / (depth + 0.0001)), MAX_WALL_HEIGHT);
+
+      // render textures
+      context.drawImage(
+        WALLS[textureImage],
+        textureOffset,                                                       /* source image X offset */
+        0,                                                                   /* source image Y offset */
+        1,                                                                   /* source image width    */
+        512,                                                                  /* source image height   */
+        mapOffsetX + ray,                                                    /* target image X offset */
+        mapOffsetY + (HALF_HEIGHT - Math.floor(wallHeight / 2)),             /* target image Y offset */
+        1,                                                                   /* target image width    */
+        wallHeight,                                                          /* target image height   */
+      );
+
+      // textures with one color only
+      context.fillStyle = '#68c48a';
+      //context.fillRect(mapOffsetX + ray, mapOffsetY + (HALF_HEIGHT - Math.floor(wallHeight / 2)), 1, wallHeight);
+
+      // darken color from farthest textures
+      //var wallDarkenAlpha = Math.floor(depth / MAP_RANGE * MAX_HEXA); //alpha of the farthest points of the map range is 0%
+      var wallDarkenAlpha = Math.min(Math.floor(depth / MAP_RANGE * 1 / K_DARKEN * MAX_HEXA), MAX_HEXA); // (depth / MAP_RANGE * K * 255): alpha of the darken points located to more than 1/K of the map range is 0%: color is dark color without transparency
+      var addCharWallDarkenAlpha = wallDarkenAlpha < 16 ? '0' : ''; // if wallDarkenAlpha<16, its hexadecimal string is of length one only
+      context.fillStyle = '#000000' + addCharWallDarkenAlpha + wallDarkenAlpha.toString(16);
+      context.fillRect(mapOffsetX + ray, mapOffsetY + (HALF_HEIGHT - Math.floor(wallHeight / 2)), 1, wallHeight);
+    
+      // update current angle
+      currentAngle -= STEP_ANGLE;
+    }
+    
+    // draw map on left shift press
+    if (showMap) { 
+      // draw 2D map
+      for (var row = 0; row < MAP_SIZE; row++) {
+        for (var col = 0; col < MAP_SIZE; col++) {
+          var square = row * MAP_SIZE + col;
+          if (map[square] != 0) {
+            context.fillStyle = '#2d55f99a';
+            context.fillRect(mapOffsetX + col * EDGE2D, mapOffsetY + row * EDGE2D, EDGE2D, EDGE2D);
+          } else {
+            context.fillStyle = '#8da3fc9a';
+            context.fillRect(mapOffsetX + col * EDGE2D, mapOffsetY + row * EDGE2D, EDGE2D, EDGE2D);
+          }
+        }
+      }
+      
+      // draw player on 2D map
+      context.fillStyle = '#c6a48b';
+      context.beginPath();
+      context.arc(playerMapX, playerMapY, Math.ceil(EDGE2D / 2), 0, DOUBLE_PI);
+      context.fill();
+      context.strokeStyle = '#624530';
+      context.lineWidth = Math.ceil(EDGE2D / 4);
+      context.beginPath();
+      context.moveTo(playerMapX, playerMapY);
+      context.lineTo(playerMapX + Math.sin(playerAngle) * EDGE2D, playerMapY + Math.cos(playerAngle) * EDGE2D);
+      context.stroke();
+    }
+    
+    // fix wall layout
+    context.fillStyle = '#99ccff';
+    context.fillRect(0, 0, canvas.width, mapOffsetY);
+    context.fillRect(0, mapOffsetY + HEIGHT, canvas.width, canvas.height - mapOffsetY - HEIGHT);
+    context.fillRect(0, mapOffsetY, mapOffsetX, HEIGHT);
+    context.fillRect(mapOffsetX + WIDTH, mapOffsetY , canvas.width - mapOffsetX - WIDTH, HEIGHT);
+
+    // infinite loop
+    setTimeout(gameLoop, cycleDelay);
+    
+    // render FPS to screen
+    context.fillStyle = '#624530';
+    //context.font = '60px Monospace';
+    context.font = FPS_TEXTFONTSIZE + 'px Monospace'; 
+    context.fillText('FPS: ' + fps_rate, mapOffsetX * 0.2, mapOffsetY + HALF_HEIGHT + HALF_FPS_TEXTFONTSIZE);
+    
+  } window.onload = function() { gameLoop(); }
+
+  function toggleCollapsibleFunction() {
+  var collapsibleContent = document.getElementById("myCollapsibleContent");
+  if (collapsibleContent.style.display === "none") {
+    collapsibleContent.style.display = "block";
+    collapsibleContent.style.content = 'plop';
+  } else {
+    collapsibleContent.style.display = "none";
+  }
+}
+  
+
+  function backgroundMusicFunction() {
+      if (backgroundMusic.paused) {
+        backgroundMusic.play();
+        backgroundMusicBtn.innerHTML = "Pause musique";
+      } else {
+        backgroundMusic.pause();
+        backgroundMusicBtn.innerHTML = "Lecture musique";
+      }
+    }
+
+
+  function commandFunction(keyEvent,keyVal,codeVal,keycodeVal){
+
+    if (event.type === 'mousedown') {
+        // Start the key press when the mouse button is held down
+        if (!keyEvent) {
+          keyEvent = new KeyboardEvent('keydown', {
+            key: keyVal,
+            code: codeVal,
+            keyCode: keycodeVal,
+          });
+          document.dispatchEvent(keyEvent);
+        }
+      } else if (event.type === 'mouseup') {
+        // Stop the key press when the mouse button is released
+        if (keyEvent) {
+          var keyEventBis = new KeyboardEvent('keyup', {
+            key: keyVal,
+            code: codeVal,
+            keyCode: keycodeVal,
+          });
+          document.dispatchEvent(keyEventBis);
+          keyEvent = null;
+        }
+      }
+    return keyEvent;
+    }
+
+  function commandMapFunction(mapShownVal){
+    if (mapShownVal) {
+        showMapVal=false;
+        mapFromButton.innerHTML = "Montrer carte";       
+      } else {
+        showMapVal=true;
+        mapFromButton.innerHTML = "Cacher carte";        
+      }
+    return showMapVal;
+  }
+
+  
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
