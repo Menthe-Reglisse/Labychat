@@ -136,7 +136,7 @@ canvas {
   var WIDTH = Math.floor(Math.ceil(0.52 * window.innerWidth) / 2) * 2, HALF_WIDTH = WIDTH / 2;
   var HEIGHT = Math.floor(Math.ceil(0.87 * window.innerHeight) / 2) * 2, HALF_HEIGHT = HEIGHT / 2;
 
-  window.addEventListener("orientationchange", function() {[WIDTH,HEIGHT]=[HEIGHT,WIDTH]; [window.innerWidth,window.innerHeight]=[window.innerHeight,window.innerWidth];});
+  window.addEventListener("orientationchange", function() {[WIDTH,HEIGHT]=[HEIGHT,WIDTH];});
 
   //var FPS_TEXTFONTSIZE = 60, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
   var FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
