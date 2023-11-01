@@ -278,7 +278,13 @@ canvas {
       FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
       STEP_ANGLE = FOV / WIDTH;
     });
-
+    window.addEventListener("resize", function() {
+      [WIDTH,HEIGHT]=[HEIGHT,WIDTH];
+      [HALF_WIDTH,HALF_HEIGHT]=[HALF_HEIGHT,HALF_WIDTH];
+      FPS_TEXTFONTSIZE = Math.floor(Math.ceil(0.087 * window.innerHeight) / 2) * 2, HALF_FPS_TEXTFONTSIZE = FPS_TEXTFONTSIZE / 2; //size in px of text font
+      STEP_ANGLE = FOV / WIDTH;
+    });
+    
     // calculate FPS
     cycleCount++;
     if (cycleCount >= FPS) cycleCount = 0;
