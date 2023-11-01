@@ -69,14 +69,19 @@ body {
   color: #f1946aff;
 }
 
-canvas { margin: 0px; padding: 0px; }
+canvas {
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+  height: 100%;
+}
 
 </style>
 </head>
 <body>
 
   <audio controls loop hidden id="myBackgroundMusic">
-    <source src="lewEasterEgg_test6_assets/sounds/Dofus_Incarnam.mp3" type="audio/mp3">
+    <source src="labychatEasterEggs_assets/sounds/Dofus_Incarnam.mp3" type="audio/mp3">
   </audio>
   
 
@@ -261,7 +266,7 @@ canvas { margin: 0px; padding: 0px; }
   // load wall textures
   for (var filename = 0; filename < 10; filename++) {
     var image = document.createElement('img');
-    image.src = 'lewEasterEgg_test6_assets/wallsTextures/' + filename + '.png';
+    image.src = 'labychatEasterEggs_assets/wallsTextures/' + filename + '.png';
     WALLS.push(image);
   }
 
