@@ -6,6 +6,7 @@ body {
   margin: 0;
   font-family: Arial;
   font-size: 1.042vw;
+  user-select: none; /*to avoid activating the selection when holding down on a touchscreen*/
 }
 
 * {
@@ -118,6 +119,8 @@ canvas {
   // init canvas
   var canvas = document.getElementById('screen');
   var context = canvas.getContext('2d');
+  
+  document.addEventListener('contextmenu', function (event) {event.preventDefault();}); //to avoid activating the menu similar to the right click options of a PC when holding down on a touchscreen
 
   // collapsible and music
 
@@ -498,6 +501,7 @@ canvas {
         backgroundMusicBtn.innerHTML = "Lecture musique";
       }
     }
+
 
   function commandFunction(keyEvent,keyVal,codeVal,keycodeVal){
 
