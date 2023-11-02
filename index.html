@@ -128,7 +128,8 @@ canvas {
 
   var backgroundMusic = document.getElementById("myBackgroundMusic");
   var backgroundMusicBtn = document.getElementById("myBackgroundMusicBtn");
-  backgroundMusicBtn.addEventListener("touchstart", function() {backgroundMusicFunction(); backgroundMusicBtn.blur();}); //option for touchscreen; blur to remove button focus
+  backgroundMusicBtn.addEventListener("touchstart", backgroundMusicFunction);
+  backgroundMusicBtn.addEventListener("touchend", function() {backgroundMusicBtn.blur();}); //option for touchscreen; blur to remove button focus
   
   // screen
   //var WIDTH = 300, HALF_WIDTH = WIDTH / 2;
