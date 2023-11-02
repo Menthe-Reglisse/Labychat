@@ -499,10 +499,9 @@ canvas {
       }
     }
 
-
   function commandFunction(keyEvent,keyVal,codeVal,keycodeVal){
 
-    if (event.type === 'mousedown') {
+    if (event.type === 'mousedown'|| event.type === 'touchstart') {
         // Start the key press when the mouse button is held down
         if (!keyEvent) {
           keyEvent = new KeyboardEvent('keydown', {
@@ -512,7 +511,7 @@ canvas {
           });
           document.dispatchEvent(keyEvent);
         }
-      } else if (event.type === 'mouseup') {
+      } else if (event.type === 'mouseup' || event.type === 'touchend') {
         // Stop the key press when the mouse button is released
         if (keyEvent) {
           var keyEventBis = new KeyboardEvent('keyup', {
