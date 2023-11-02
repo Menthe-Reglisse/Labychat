@@ -125,7 +125,7 @@ canvas {
 
   var backgroundMusic = document.getElementById("myBackgroundMusic");
   var backgroundMusicBtn = document.getElementById("myBackgroundMusicBtn");
-  backgroundMusicBtn.addEventListener("touchstart", backgroundMusicFunction);//option for phone
+  backgroundMusicBtn.addEventListener("touchstart", backgroundMusicFunction); //option for touchscreen
   
   // screen
   //var WIDTH = 300, HALF_WIDTH = WIDTH / 2;
@@ -227,30 +227,39 @@ canvas {
   var keyEventUp = null;
 
   upFromButton.addEventListener('mousedown', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)});
-  upFromButton.addEventListener('mouseup', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)});  
+  upFromButton.addEventListener('mouseup', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)});
+  upFromButton.addEventListener('touchstart', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)}); //option for touchscreen
+  upFromButton.addEventListener('touchend', function() {keyEventUp=commandFunction(keyEventUp,'ArrowUp','ArrowUp',38)}); //option for touchscreen
 
   var downFromButton = document.getElementById('myCommandDownBtn');
   var keyEventDown = null;
 
   downFromButton.addEventListener('mousedown', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)});
-  downFromButton.addEventListener('mouseup', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)});  
+  downFromButton.addEventListener('mouseup', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)});
+  downFromButton.addEventListener('touchstart', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)}); //option for touchscreen
+  downFromButton.addEventListener('touchend', function() {keyEventDown=commandFunction(keyEventDown,'ArrowDown','ArrowDown',40)}); //option for touchscreen
 
   var leftFromButton = document.getElementById('myCommandLeftBtn');
   var keyEventLeft = null;
 
   leftFromButton.addEventListener('mousedown', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)});
-  leftFromButton.addEventListener('mouseup', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)});  
-  
+  leftFromButton.addEventListener('mouseup', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)});
+  leftFromButton.addEventListener('touchstart', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)}); //option for touchscreen
+  leftFromButton.addEventListener('touchend', function() {keyEventLeft=commandFunction(keyEventLeft,'ArrowLeft','ArrowLeft',37)}); //option for touchscreen
+
   var rightFromButton = document.getElementById('myCommandRightBtn');
   var keyEventRight = null;
 
   rightFromButton.addEventListener('mousedown', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});
-  rightFromButton.addEventListener('mouseup', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});    
+  rightFromButton.addEventListener('mouseup', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});  
+  rightFromButton.addEventListener('touchstart', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)}); //option for touchscreen
+  rightFromButton.addEventListener('tpuchend', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)}); //option for touchscreen
 
   var mapFromButton = document.getElementById('myCommandMapBtn');
   
   mapFromButton.addEventListener('click', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;});
-  
+  mapFromButton.addEventListener('touchscreen', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;}); //option for touchscreen
+
   // camera
   const DOUBLE_PI = 2 * Math.PI;
   const FOV = Math.PI / 3;
@@ -275,7 +284,7 @@ canvas {
 
   // game loop
   function gameLoop() {
-    // detect phone screen orientation change and adapt dependent displays
+    // detect device screen orientation change and adapt dependent displays
     screen.orientation.addEventListener('change', function() {
 
       clearTimeout(orientationChangeTimer);
