@@ -253,12 +253,12 @@ canvas {
   rightFromButton.addEventListener('mousedown', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});
   rightFromButton.addEventListener('mouseup', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)});  
   rightFromButton.addEventListener('touchstart', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)}); //option for touchscreen
-  rightFromButton.addEventListener('tpuchend', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)}); //option for touchscreen
+  rightFromButton.addEventListener('touchend', function() {keyEventRight=commandFunction(keyEventRight,'ArrowRight','ArrowRight',39)}); //option for touchscreen
 
   var mapFromButton = document.getElementById('myCommandMapBtn');
   
   mapFromButton.addEventListener('click', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;});
-  mapFromButton.addEventListener('touchscreen', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;}); //option for touchscreen
+  mapFromButton.addEventListener('touchstart', function() {showMap=commandMapFunction(shownMap); shownMap=showMap;}); //option for touchscreen
 
   // camera
   const DOUBLE_PI = 2 * Math.PI;
